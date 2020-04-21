@@ -22,9 +22,12 @@
  */
 package com.gitlab.elwinbran.tools.lstpatchmaker;
 
-import java.io.BufferedWriter;
+
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 
@@ -55,12 +58,7 @@ public class Program
                 destinationFile = args[1];
                 File target = new File(targetFile);
                 File destination = new File(destination);
-                BufferedWriter patchWriter = new BufferedWriter(new FileWriter(destination, true));
-                //50 41 54 43 48 START
-                // 3 byte OFFSET
-                // 2 byte LENGHT of CHANGES
-                // DATA
-                //45 4F 46 END
+                
             }
         }
         else
@@ -75,6 +73,28 @@ public class Program
             Integer pureLocation = 0;
             List<Byte> location = null;
             //get line data pure and accept any space like characters to be the breaks.
+        }
+    }
+    
+    private static conversion(File target, File destination, TextDisplay processOutput)
+    {
+        
+        //make map step
+
+        //apply map to IPS file step
+        try {
+            FileOutputStream patchWriter = new FileOutputStream(destination);
+            patchWriter.write(new byte[]{0x50,0x41,0x54,0x43,0x48});
+            //50 41 54 43 48 START 'PATCH'
+            // 3 byte OFFSET
+            // 2 byte LENGHT of CHANGES
+            // DATA
+            //45 4F 46 END
+        } catch (FileNotFoundException ex) {
+            processOutput.show("Conversion failed! The IPS file could not be found anymore: " + ex.getMessage());
+        } catch (IOException ex) {
+            processOutput.show("Conversion failed! Something happened during writing the patch: " + ex.getMessage());
+            destination.delete();
         }
     }
 }
