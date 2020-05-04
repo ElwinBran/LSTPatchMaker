@@ -78,17 +78,45 @@ public class Program
     
     private static void conversion(File target, File destination, TextDisplay processOutput)
     {
-        
+        //extract basic info.
+        Map<Integer, List<Byte>> objects = objects(target);
         //make map step
-
+        List<Record> records = records(objects);
         //apply map to IPS file step
         try {
             FileOutputStream patchWriter = new FileOutputStream(destination);
             patchWriter.write(new byte[]{0x50,0x41,0x54,0x43,0x48});
             //50 41 54 43 48 START 'PATCH'
-            // 3 byte OFFSET
-            // 2 byte LENGHT of CHANGES
-            // DATA
+            for(Record record : records)
+            {
+                Integer offset = record.offset();
+                List<Byte> changes = record.data();
+                //----Exception, when offset = EOF
+                if (offset == 0x454F46)//TODO fix magic number
+                {
+                    processOutput.show("Conversion failed! The source file contained a change for offset 0x454F46, which is incompatible with IPS.");
+                    destination.delete();
+                    break;
+                }
+                // 3 byte OFFSET
+                byte b1 = (byte) ((offset >> 16) & 0xFF);
+                patchWriter.write(b1);
+                byte b2 = (byte) ((offset >> 8) & 0xFF);
+                patchWriter.write(b2);
+                byte b3 = (byte) (offset & 0xFF);
+                patchWriter.write(b3);
+                // 2 byte LENGHT of CHANGES
+                byte l1 = (byte) ((changes.size() >> 8) & 0xFF);
+                patchWriter.write(l1);
+                byte l2 = (byte) (changes.size() & 0xFF);
+                patchWriter.write(l2);
+                // DATA
+                for(Byte change : changes)
+                {
+                    patchWriter.write(change);
+                }
+            }
+            patchWriter.write(new byte[]{0x45, 0x4F, 0x46});
             //45 4F 46 END
         } catch (FileNotFoundException ex) {
             processOutput.show("Conversion failed! The IPS file could not be found anymore: " + ex.getMessage());
