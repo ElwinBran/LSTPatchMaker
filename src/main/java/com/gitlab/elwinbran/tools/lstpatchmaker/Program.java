@@ -97,6 +97,24 @@ public class Program
             destination.delete();
         }
     }
+    private static void add(Map<Integer, List<Byte>> objects, String location, String object)
+    {
+        Integer numberLocation = Integer.parseInt(location, 16);
+        List data = new ArrayList<>();
+        char[] hexDigits = object.toCharArray();
+        for(int i = 0; i < hexDigits.length; i += 2)
+        {
+            String singleString = Character.toString(hexDigits[i]) + Character.toString(hexDigits[i + 1]);
+            byte single = ((Integer)Integer.parseInt(singleString, 16)).byteValue();
+            data.add(single);
+        }
+        if(data.size() > Short.MAX_VALUE)
+        {
+            throw new RuntimeException("The change at 0x" + location + "is too large and not supported by the IPS format.");
+        }
+        objects.put(numberLocation, data);
+    }
+    
     private static List<Record> records(Map<Integer, List<Byte>> objects)
     {
         List<Record> result = new LinkedList<>();
