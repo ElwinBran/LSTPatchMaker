@@ -32,7 +32,9 @@ import java.util.List;
 
 
 /**
- *
+ * Full LST conversion program code. 
+ * Invoked via commandline or produces a JavaFX window to select files.
+ * 
  * @author Elwin Slokker
  */
 public class Program
