@@ -97,6 +97,43 @@ public class Program
             destination.delete();
         }
     }
+    private static void object(Map<Integer, List<Byte>> objects, String line)
+    {
+        Pattern hexStartDetection = Pattern.compile("^([0-9A-F]){2,}");
+        Pattern hexDetection = Pattern.compile("([0-9A-F]){2,}");
+        Matcher lineStuff = hexStartDetection.matcher(line);
+        Matcher genericMatch = hexDetection.matcher(line);
+        if (lineStuff.find())
+        {
+            String location = lineStuff.group();
+            genericMatch.find(location.length());
+            String stringObject = genericMatch.group();
+            if(stringObject != null)
+            {
+                boolean exception = false;
+                //--uneven exception
+                if(location.length() > 6)//TODO magic number
+                {
+                    //exception
+                }
+                //--uneven exception
+                if (!exception)
+                {
+                    add(objects, location, stringObject);
+                }
+            }
+            else
+            {
+                //--only offset found exception
+                if(location.length() > 6)//TODO magic number
+                {
+                    //exception
+                }
+                //--uneven exception
+            }
+        }
+    }
+    
     private static void add(Map<Integer, List<Byte>> objects, String location, String object)
     {
         Integer numberLocation = Integer.parseInt(location, 16);
