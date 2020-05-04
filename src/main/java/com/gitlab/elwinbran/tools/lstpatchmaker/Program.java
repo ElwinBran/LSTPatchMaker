@@ -69,7 +69,7 @@ public class Program
         }
     }
     
-    private static conversion(File target, File destination, TextDisplay processOutput)
+    private static void conversion(File target, File destination, TextDisplay processOutput)
     {
         
         //make map step
