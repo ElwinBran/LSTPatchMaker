@@ -90,6 +90,24 @@ public class Program
             destination.delete();
         }
     }
+    private static List<Record> records(Map<Integer, List<Byte>> objects)
+    {
+        List<Record> result = new LinkedList<>();
+        for(Integer offset : objects.keySet())
+        {
+            List<Byte> data = objects.get(offset);
+            if(result.isEmpty())
+            {
+                result.add(new Record(offset, data));
+            }
+            else
+            {
+                
+            }
+        }
+        return result;
+    }
+    
     private static class Record
     {
         private final int offset;
