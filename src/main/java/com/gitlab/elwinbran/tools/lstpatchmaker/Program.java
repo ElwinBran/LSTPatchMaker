@@ -66,8 +66,8 @@ public class Program
                 targetFile = args[0];
                 destinationFile = args[1];
                 File target = new File(targetFile);
-                File destination = new File(destination);
-                
+                File destination = new File(destinationFile);
+                conversion(target, destination, new PrintStreamTextDisplay(System.out));
             }
         }
         else
