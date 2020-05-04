@@ -97,6 +97,29 @@ public class Program
             destination.delete();
         }
     }
+    
+    private static Map<Integer, List<Byte>> objects(File target)
+    {
+        Map<Integer, List<Byte>> objects = new HashMap<>();
+        try {
+            FileReader fr = new FileReader(target);
+            BufferedReader reader = new BufferedReader(fr);
+            reader.readLine();
+            String line = reader.readLine();
+            while(line != null)
+            {
+                object(objects, line);
+                line = reader.readLine();
+            }
+            fr.close();
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        return objects;
+    }
+    
     private static void object(Map<Integer, List<Byte>> objects, String line)
     {
         Pattern hexStartDetection = Pattern.compile("^([0-9A-F]){2,}");
