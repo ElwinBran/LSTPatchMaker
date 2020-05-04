@@ -187,6 +187,98 @@ public class Program
             }
             else
             {
+                Record last = result.get(result.size() -1);
+                if(last.end() < offset)//-1
+                {
+                    result.add(new Record(offset, data));
+                }
+                else if(last.end() == offset)//-1
+                {
+                    List<Byte> merged = new ArrayList<>(last.data());
+                    merged.addAll(data);
+                    Record newMerge = new Record (last.offset(), merged);
+                    result.remove(result.size() - 1);
+                    result.add(newMerge);
+                }
+                else
+                {
+                    int endOffset = offset + data.size();
+                    for(int i = 0; i < result.size(); i++)
+                    {
+                        Record record = result.get(i);
+                        if(record.offset() > endOffset)//-1
+                        {
+                            Record newRecord = new Record(offset, data);
+                            result.add(i, newRecord);
+                            break;
+                        }
+                        else if(record.offset()== endOffset)//-1
+                        {
+                            List<Byte> merged = new ArrayList<>(data);
+                            merged.addAll(record.data());
+                            if(data.size() > Short.MAX_VALUE)
+                            {
+                                throw new RuntimeException("The change at 0x" + offset + "is too large and not supported by the IPS format.");
+                            }
+                            Record newMerge = new Record (offset, merged);
+                            result.remove(i);
+                            result.add(i, newMerge);
+                            
+                            break;
+                        }
+                        else if(record.end() == offset)//-1
+                        {
+                            if(i < result.size() - 1)
+                            {
+                                //if endoffset is not under the next... then merge
+                                if(result.get(i + 1).offset() > endOffset)
+                                {
+                                    List<Byte> merged = new ArrayList<>(record.data());
+                                    merged.addAll(data);
+                                    if(merged.size() > Short.MAX_VALUE)
+                                    {
+                                        throw new RuntimeException("The total change at 0x" + record.offset() + "is too large and not supported by the IPS format.");
+                                    }
+                                    Record newMerge = new Record (record.offset(), merged);
+                                    result.remove(i);
+                                    result.add(i, newMerge);
+                                    break;
+                                }
+                                //again a -1 after offset()
+                                else if(result.get(i + 1).offset() == endOffset)//rare double merge
+                                {
+                                    List<Byte> merged = new ArrayList<>(record.data());
+                                    merged.addAll(data);
+                                    merged.addAll(result.get(i + 1).data());
+                                    if(merged.size() > Short.MAX_VALUE)
+                                    {
+                                        throw new RuntimeException("The total change at 0x" + record.offset() + "is too large and not supported by the IPS format.");
+                                    }
+                                    Record newMerge = new Record (record.offset(), merged);
+                                    result.remove(i);
+                                    result.remove(i);
+                                    result.add(i, newMerge);
+                                    break;
+                                }
+                                else
+                                {
+                                    //exception!
+                                    throw new RuntimeException("I was too lazy to implement serious exceptions still. Invalid records.");
+                                }
+                                
+                            }
+                        }
+                        else if(record.end() < offset)
+                        {
+                            //nothing
+                        }
+                        else
+                        {
+                            //exception
+                            throw new RuntimeException("I was too lazy to implement serious exceptions still. Invalid records.");
+                        }
+                    }
+                }
                 
             }
         }
