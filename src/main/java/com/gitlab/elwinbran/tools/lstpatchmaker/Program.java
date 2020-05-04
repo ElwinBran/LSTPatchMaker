@@ -67,15 +67,6 @@ public class Program
         {
             //FX route
         }
-        //check if a file is given
-        //bla bla line readers from files.
-        {
-            String line = "";
-            List<Byte> location = null;
-            Integer pureLocation = 0;
-            List<Byte> location = null;
-            //get line data pure and accept any space like characters to be the breaks.
-        }
     }
     
     private static conversion(File target, File destination, TextDisplay processOutput)
