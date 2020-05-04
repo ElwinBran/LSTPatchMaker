@@ -90,4 +90,33 @@ public class Program
             destination.delete();
         }
     }
+    private static class Record
+    {
+        private final int offset;
+        
+        private final List<Byte> data;
+        
+        public Record(int offset, List<Byte> data)
+        {
+            this.offset = offset;
+            this.data = data;
+        }
+        
+        public int offset()
+        {
+            return this.offset;
+        }
+        
+        public int end()
+        {
+            return this.data.size() + this.offset;
+        }
+        
+        public List<Byte> data()
+        {
+            return this.data;
+        }
+                
+    }
+    
 }
