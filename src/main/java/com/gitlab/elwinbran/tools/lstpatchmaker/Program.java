@@ -82,6 +82,12 @@ public class Program
     {
         //extract basic info.
         Map<Integer, List<Byte>> objects = objects(target);
+        if(objects.isEmpty())
+        {
+            processOutput.show("The target file did not contain any offset changes, deleting new IPS file.");
+            destination.delete();
+            return;
+        }
         //make map step
         List<Record> records = records(objects);
         //apply map to IPS file step
@@ -120,6 +126,8 @@ public class Program
             }
             patchWriter.write(new byte[]{0x45, 0x4F, 0x46});
             //45 4F 46 END
+            patchWriter.close();
+            processOutput.show("Conversion completed");
         } catch (FileNotFoundException ex) {
             processOutput.show("Conversion failed! The IPS file could not be found anymore: " + ex.getMessage());
         } catch (IOException ex) {
@@ -167,9 +175,12 @@ public class Program
                 //--uneven exception
                 if(location.length() > 6)//TODO magic number
                 {
-                    //exception
+                    throw new RuntimeException("A change offset cannot exceed 3 bytes, or 24 bits; the read string '" + location + "' exceeds 6 characters.");
                 }
-                //--uneven exception
+                if(stringObject.length() % 2 == 1)
+                {
+                    throw new RuntimeException("The change of the '" + location + "' offset, cannot be parsed: A hex digit is missing from either end (the total amount of digits is uneven).");
+                }
                 if (!exception)
                 {
                     add(objects, location, stringObject);
@@ -180,9 +191,12 @@ public class Program
                 //--only offset found exception
                 if(location.length() > 6)//TODO magic number
                 {
-                    //exception
+                    throw new RuntimeException("The offset '" + location + "' exceeds 6 characters and does not have changes attached.");
                 }
-                //--uneven exception
+                else
+                {
+                    throw new RuntimeException("The offset '" + location + "'does not have changes attached.");
+                }
             }
         }
     }
