@@ -59,6 +59,8 @@ public class Program
             if (args[0].equals(helpOption) || args[0].equalsIgnoreCase(helpArgument))
             {
                 //help messages
+                System.out.println("Use the LST conversion tool by either providing a TARGET and DESTINATION file paths...");
+                System.out.println("Or simply run the tool WITHOUT arguments to start a JavaFX selection dialogue.");
             }
             else
             {
