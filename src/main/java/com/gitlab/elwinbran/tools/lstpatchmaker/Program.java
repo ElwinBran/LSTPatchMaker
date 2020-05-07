@@ -44,38 +44,58 @@ import java.util.regex.Pattern;
  * 
  * @author Elwin Slokker
  */
-public class Program
+public class Program extends Application
 {
-    public static void main(String[] args)
+    
+    @Override
+    public void start(Stage stage) throws Exception
     {
         final String helpOption = "-h";
         final String helpArgument = "help";
+        final List<String> arguments = getParameters().getRaw();
         
-        
-        String targetFile;
-        String destinationFile;
-        if (args.length > 0)
+        if (arguments.size() > 0)
         {
-            if (args[0].equals(helpOption) || args[0].equalsIgnoreCase(helpArgument))
+            if (arguments.get(0).equals(HELP_OPTION) || arguments.get(0).equalsIgnoreCase(HELP_ARGUMENT))
             {
                 //help messages
                 System.out.println("Use the LST conversion tool by either providing a TARGET and DESTINATION file paths...");
                 System.out.println("Or simply run the tool WITHOUT arguments to start a JavaFX selection dialogue.");
+                Platform.exit();
             }
             else
             {
                 //commandline route
-                targetFile = args[0];
-                destinationFile = args[1];
+                String targetFile = arguments.get(0);
+                String destinationFile = arguments.get(1);
                 File target = new File(targetFile);
                 File destination = new File(destinationFile);
                 conversion(target, destination, new PrintStreamTextDisplay(System.out));
+                Platform.exit();
             }
         }
         else
         {
             //FX route
+            FileChooser targetFileChooser = new FileChooser();
+            FileChooser destinationFileChooser = new FileChooser();
+            File target = targetFileChooser.showOpenDialog(stage);
+            File destination = destinationFileChooser.showSaveDialog(stage);
+            TextDisplay fxAlertDisplay = new FXAlert(Alert.AlertType.ERROR, ButtonType.CLOSE,(double)100.0);
+            try
+            {
+                conversion(target, destination, fxAlertDisplay);
+            }
+            catch(RuntimeException ex)
+            {
+                fxAlertDisplay.show(ex.getMessage());
+            }
         }
+    }
+    
+    public static void main(String[] args)
+    {
+        launch(args);
     }
     
     private static void conversion(File target, File destination, TextDisplay processOutput)
@@ -127,7 +147,6 @@ public class Program
             patchWriter.write(new byte[]{0x45, 0x4F, 0x46});
             //45 4F 46 END
             patchWriter.close();
-            processOutput.show("Conversion completed");
         } catch (FileNotFoundException ex) {
             processOutput.show("Conversion failed! The IPS file could not be found anymore: " + ex.getMessage());
         } catch (IOException ex) {
@@ -142,7 +161,6 @@ public class Program
         try {
             FileReader fr = new FileReader(target);
             BufferedReader reader = new BufferedReader(fr);
-            reader.readLine();
             String line = reader.readLine();
             while(line != null)
             {
